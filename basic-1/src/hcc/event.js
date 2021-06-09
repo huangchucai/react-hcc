@@ -13,11 +13,28 @@ export function addEvent(dom, eventType, listener) {
 }
 
 
+function createSyntheticEvent(nativeEvent) {
+  let syntheticEvent = {}
+  for (const nativeEventKey in nativeEvent) {
+    syntheticEvent[nativeEventKey] = nativeEvent
+  }
+  return syntheticEvent
+}
+
 function dispatchEvent(event) {
   let { target, type } = event
   let eventType = `on${type}`
   updateQueue.isBatchingUpdate = true
-  let { store } = target
-  let listener = store && store[eventType]
-  listener.call(target, event)
+  let syntheticEvent = createSyntheticEvent(event)
+  while (target) {
+    let { store } = target
+    let listener = store && store[eventType]
+    listener && listener.call(target, syntheticEvent)
+    target = target.parentNode
+  }
+
+  for (const syntheticEventKey in syntheticEvent) {
+    syntheticEvent[syntheticEventKey] = null
+  }
+  updateQueue.batchUpdate()
 }

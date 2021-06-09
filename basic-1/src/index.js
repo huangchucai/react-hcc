@@ -3,7 +3,6 @@ import ReactDOM from './hcc/react-dom'
 // import React from 'react'
 // import ReactDOM from 'react-dom'
 import './index.css'
-import { updateQueue } from './hcc/component'
 // import App from './App'
 console.log(JSON.stringify(React.createElement('h1', {
   className: 'title',
@@ -21,7 +20,6 @@ class Count extends React.Component {
   }
 
   handleClick = () => {
-    updateQueue.isBatchingUpdate = true
     this.setState({
       number: this.state.number + 1
     })
@@ -29,12 +27,13 @@ class Count extends React.Component {
     this.setState(prev => {
       return {number: prev.number + 1 }
     })
-    updateQueue.batchUpdate()
   }
 
   render() {
     return (
-        <div>
+        <div onClick={() => {
+          console.log('click')
+        }}>
           <p>{this.state.number}</p>
           <button onClick={() => this.handleClick()}>+1</button>
         </div>
