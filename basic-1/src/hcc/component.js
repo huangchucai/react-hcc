@@ -31,16 +31,17 @@ class Updater {
     updateQueue.isBatchingUpdate ? updateQueue.add(this) : this.updateComponent()
   }
 
+  // 组件更新
   updateComponent() {
     let { classInstance, pendingStates } = this
     if (pendingStates.length > 0) { // 说明有等待更新的状态
-      classInstance.state = this.getState()
-      classInstance.forceUpdate()
+      shouldComponent(classInstance, this.getState())
     }
   }
 
   // 根据老状态 更新 新状态
   getState() {
+    console.log('pendingStates')
     let { classInstance, pendingStates } = this
     let { state } = classInstance
     if (pendingStates.length > 0) {
@@ -56,6 +57,19 @@ class Updater {
   }
 }
 
+function shouldComponent(classInstance, newState) {
+  // 就算没有更新，也需要更新state
+  classInstance.state = newState
+  //todo: props暂时没有处理
+  if(classInstance.shouldComponentUpdate
+      && !classInstance.shouldComponentUpdate(classInstance.props,newState)) {
+    return
+  }
+  if(classInstance.componentWillMount) {
+    classInstance.componentWillMount()
+  }
+  classInstance.forceUpdate()
+}
 
 class Component {
   static isReactComponent = true
@@ -89,6 +103,9 @@ function updateClassInstance(classInstance, newVdom) {
   let newDom = createDOM(newVdom) //得到真实dom
   let oldDom = classInstance.dom
   oldDom.parentNode.replaceChild(newDom, oldDom)
+  if(classInstance.componentDidUpdate) {
+    classInstance.componentDidUpdate()
+  }
   classInstance.dom = newDom
 }
 

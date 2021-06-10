@@ -4,36 +4,55 @@ import ReactDOM from './hcc/react-dom'
 // import ReactDOM from 'react-dom'
 import './index.css'
 // import App from './App'
+/*
 console.log(JSON.stringify(React.createElement('h1', {
   className: 'title',
-  style: { color: 'red' }
+  style: { color: 'red' },
 }, 'hello', 'weod'), null, 1))
+*/
 
 
 
 class Count extends React.Component {
   constructor(props) {
+    console.log('set up props and state')
     super(props)
     this.state = {
       number: 0
     }
   }
 
+  componentWillMount() {
+    console.log('componentWillMount')
+  }
+  componentDidMount() {
+    console.log('componentDidMount')
+  }
   handleClick = () => {
-    this.setState({
-      number: this.state.number + 1
-    })
-    console.log(this.state.number)
+    // this.setState({
+    //   number: this.state.number + 1
+    // })
+    // console.log(this.state.number)
     this.setState(prev => {
       return {number: prev.number + 1 }
     })
   }
+  shouldComponentUpdate(newProps, newStart) {
+    console.log('shouldComponentUpdate',newProps,newStart)
+    return newStart.number % 2 === 0
+  }
+  componentWillUpdate() {
+    console.log('componentWillUpdate')
+
+  }
+  componentDidUpdate() {
+    console.log('componentDidUpdate')
+  }
 
   render() {
+    console.log('render')
     return (
-        <div onClick={() => {
-          console.log('click')
-        }}>
+        <div>
           <p>{this.state.number}</p>
           <button onClick={() => this.handleClick()}>+1</button>
         </div>
@@ -45,7 +64,7 @@ const element = React.createElement('h1', {
   className: 'title',
   style: { color: 'red' }
 }, React.createElement('span', null, 'hello'), 'world')
-console.log(JSON.stringify(element, null, 2))
+// console.log(JSON.stringify(element, null, 2))
 
 //
 // function Welcome(props) {
@@ -64,10 +83,37 @@ class Welcome extends React.Component {
   }
 }
 
+
+/*class CountAdd extends React.Component {
+  constructor(props) {
+    super(props);
+    this.a = React.createRef()
+    this.b = React.createRef()
+    this.c = React.createRef()
+  }
+  add = () => {
+    let aValue = this.a.current.value
+    let bValue = this.b.current.value
+    this.c.current.value = parseFloat(aValue) + parseFloat(bValue)
+  }
+  render() {
+    return (
+        <div>
+          <input ref={this.a} type="text"/> <br/>
+          <input ref={this.b} type="text"/>
+          <button onClick={this.add}>=</button><br/>
+          <input type="text" ref={this.c}/>
+        </div>
+    )
+  }
+}*/
+
+
 ReactDOM.render(
     // element,
-    <Count/>,
+    // <CountAdd/>,
     // <Welcome name='hcc' />,
+    <Count />,
     document.getElementById('root')
 )
 

@@ -12,9 +12,12 @@ import Component from './component'
  * @returns {{type, props}}
  */
 function createElement(type, config, children) {
+  let ref
   if (config) {
     delete config._owner
     delete config._store
+    ref = config.ref
+    delete config.ref
   }
   let props = { ...config }
   if (arguments.length > 3) {
@@ -23,11 +26,13 @@ function createElement(type, config, children) {
   props.children = children // children 可能是数组(多个子元素)，字符串，数字，null， react元素
   return {
     type,
+    ref,
     props
   }
 }
 /*
   'type': 'h1',
+  'ref: null,
   'props': {
     'className': 'title',
     'style': {
@@ -40,8 +45,15 @@ function createElement(type, config, children) {
   }
 */
 
+function createRef() {
+  return {
+    current: null
+  }
+}
+
 const React = {
   Component,
+  createRef,
   createElement,
 }
 

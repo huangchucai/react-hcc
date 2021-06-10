@@ -25,11 +25,10 @@ function updateProps(dom, props) {
         console.log(styleObj)
         dom.style[styleObjKey] = styleObj[styleObjKey]  // dom.style.color = 'red'
       }
-    } else if(key.startsWith('on')) {
+    } else if (key.startsWith('on')) {
       addEvent(dom, key.toLocaleLowerCase(), props[key])
       // dom[key.toLocaleLowerCase()] = props[key]
-    }
-    else {
+    } else {
       dom[key] = props[key] // dom.className = 'title'
     }
   }
@@ -64,10 +63,17 @@ function updateFunctionComponent(vdom) {
  */
 function updateClassComponent(vdom) {
   let { type, props } = vdom
-  let classInstance = new type(props) // new Welcome({name:'hcc'})
-  let renderVdom = classInstance.render()
-  let dom =  createDOM(renderVdom)
+  let classInstance = new type(props) // new Welcome({name:'hcc'}) // 1. 执行了组件的constructor
+  if (classInstance.componentWillMount) {
+    classInstance.componentWillMount()  // 2. 执行组件componentWillMount
+  }
+  let renderVdom = classInstance.render() // 3. 执行组件的render
+  let dom = createDOM(renderVdom)
   classInstance.dom = dom // 让类组件的实例上挂一个真实的dom
+  // 简单处理componentWillMount
+  if (classInstance.componentDidMount()) {
+    classInstance.componentDidMount()  // 2. 执行组件componentWillMount
+  }
   return dom
 }
 
@@ -82,7 +88,7 @@ export function createDOM(vdom) {
   if (!vdom) return ''
 
   // 否则就是一个React元素
-  let { type, props } = vdom
+  let { type, props, ref } = vdom
   let dom
   // 如果是一个组件（函数组件，或者类组件）
   if (typeof type === 'function') {
@@ -108,6 +114,10 @@ export function createDOM(vdom) {
     reconcileChildren(props.children, dom)
   } else {
     dom.textContent = props.children ? props.children.toString() : ''
+  }
+
+  if (ref) {
+    ref.current = dom
   }
   return dom
 }
