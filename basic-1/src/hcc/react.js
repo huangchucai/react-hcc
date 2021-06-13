@@ -12,7 +12,7 @@ import Component from './component'
  * @returns {{type, props}}
  */
 function createElement(type, config, children) {
-  console.log(1)
+  console.log('createElement')
   let ref
   if (config) {
     delete config._owner
@@ -53,9 +53,9 @@ function createRef() {
 }
 
 const React = {
+  createElement,
   Component,
   createRef,
-  createElement,
 }
 
 

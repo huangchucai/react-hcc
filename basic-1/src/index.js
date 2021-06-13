@@ -12,9 +12,9 @@ console.log(JSON.stringify(React.createElement('h1', {
 */
 
 
-class Count extends React.Component {
+class Counter extends React.Component {
   constructor(props) {
-    console.log('set up props and state')
+    console.log('父组件：set up props and state')
     super(props)
     this.state = {
       number: 0
@@ -22,11 +22,11 @@ class Count extends React.Component {
   }
 
   componentWillMount() {
-    console.log('componentWillMount')
+    console.log('父组件：componentWillMount')
   }
 
   componentDidMount() {
-    console.log('componentDidMount')
+    console.log('父组件：componentDidMount')
   }
 
   handleClick = () => {
@@ -40,27 +40,68 @@ class Count extends React.Component {
   }
 
   shouldComponentUpdate(newProps, newStart) {
-    console.log('shouldComponentUpdate', newProps, newStart)
+    console.log('父组件：shouldComponentUpdate', newProps, newStart)
     return newStart.number % 2 === 0
   }
 
   componentWillUpdate() {
-    console.log('componentWillUpdate')
+    console.log('父组件：componentWillUpdate')
 
   }
 
   componentDidUpdate() {
-    console.log('componentDidUpdate')
+    console.log('父组件：componentDidUpdate')
   }
 
   render() {
-    console.log('render')
+    console.log('父组件：render')
     return (
-        <div>
+        <div id={`counter${this.state.number}`}>
           <p>{this.state.number}</p>
+          {this.state.number === 4 ? null : <ChildCounter count={this.state.number}/>}
           <button onClick={() => this.handleClick()}>+1</button>
         </div>
     )
+  }
+}
+
+
+class ChildCounter extends React.Component {
+  constructor(props) {
+    super(props)
+    console.log('子组件：set up props and state')
+  }
+  componentWillReceiveProps(nextProps, nextContext) {
+    console.log('子组件：componentWillReceiveProps')
+
+  }
+  componentWillUpdate() {
+    console.log('子组件：componentWillUpdate')
+
+  }
+
+  componentDidUpdate() {
+    console.log('子组件：componentDidUpdate')
+  }
+
+  componentWillMount() {
+    console.log('子组件：componentWillMount')
+  }
+
+  componentWillUnmount() {
+    console.log('子组件：componentWillUnmount')
+  }
+
+  componentDidMount() {
+    console.log('子组件：componentDidMount')
+  }
+  render() {
+    return (
+        <div id="child-counter">
+          <p>{this.props.count}</p>
+        </div>
+    )
+
   }
 }
 
@@ -80,12 +121,6 @@ class Count extends React.Component {
 //   // }, React.createElement('span', null, 'hello'), 'world')
 //   return <h1>hello {props.name}</h1>
 // }
-
-class Welcome extends React.Component {
-  render() {
-    return <h1>hello, {this.props.name}</h1>
-  }
-}
 
 
 /*class CountAdd extends React.Component {
@@ -112,31 +147,17 @@ class Welcome extends React.Component {
   }
 }*/
 
-class demo extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      number: 1
-    }
-  }
 
-  render() {
-    let element
-    let state = this.state.number
-    if (state > 0) {
-      element = null
-    } else {
-      element = this.state.number
-    }
-    return element
-  }
-}
-
+const element = <Counter />
+const a = <div>ddd</div>
+console.log(a)
+console.log(element)
+// console.log(element)
 ReactDOM.render(
     // element,
     // <CountAdd/>,
     // <Welcome name='hcc' />,
-    <Count/>,
+    element,
     document.getElementById('root')
 )
 

@@ -6,6 +6,7 @@
 import { addEvent } from './event'
 
 function render(vdom, root) {
+  console.log(vdom)
   const dom = createDOM(vdom)
   root.appendChild(dom)
 }
@@ -22,7 +23,6 @@ function updateProps(dom, oldProps, newProps) {
       let styleObj = newProps[key]
       for (const styleObjKey in styleObj) {
         // dom.setAttribute('style', styleObj[styleObjKey])
-        console.log(styleObj)
         dom.style[styleObjKey] = styleObj[styleObjKey]  // dom.style.color = 'red'
       }
     } else if (key.startsWith('on')) {
@@ -65,7 +65,7 @@ function updateClassComponent(vdom) {
   let { type, props } = vdom
   let classInstance = new type(props) // new Welcome({name:'hcc'}) // 1. 执行了组件的constructor
   console.log(1)
-  vdom.classInstance = classInstance // 让虚拟dom的classInstance = 类组件实例 todo:
+  vdom.classInstance = classInstance // 让虚拟dom的classInstance = 类组件实例
   if (classInstance.componentWillMount) {
     classInstance.componentWillMount()  // 2. 执行组件componentWillMount
   }
@@ -130,11 +130,8 @@ function updateClassInstance(oldVdom, newVdom) {
 
 }
 
-function updateprops(currentDom, props, props2) {
 
-}
-
-function updateChild(currentDom, children, children2) {
+function updateChild(currentDom, oldChildren, newChildren) {
 
 }
 
@@ -147,10 +144,12 @@ function updateChild(currentDom, children, children2) {
  * @param newVdom
  */
 function updateElement(oldVdom, newVdom) {
+  // 需要复用老的dom节点
   let currentDom = newVdom.dom = oldVdom.dom
   newVdom.classInstance = oldVdom.classInstance
+
   if (typeof oldVdom.type === 'string') { // 原生的dom类型
-    updateprops(currentDom, oldVdom.props, newVdom.props)
+    updateProps(currentDom, oldVdom.props, newVdom.props)
     updateChild(currentDom, oldVdom.props.children, newVdom.props.children)
   } else if (typeof oldVdom.type === 'function') {
     updateClassInstance(oldVdom, newVdom)
@@ -164,16 +163,16 @@ function updateElement(oldVdom, newVdom) {
  * @param newVdom
  */
 export function compareTwoVdom(parentDOM, oldVdom, newVdom) {
-  if (oldVdom === null && newVdom === null) {
+  if (!oldVdom && !newVdom) {
     return null
-  } else if (oldVdom && newVdom === null) { // 如果旧的虚拟dom有，新的没有，就需要删除旧的虚拟dom
+  } else if (oldVdom && !newVdom) { // 如果旧的虚拟dom有，新的没有，就需要删除旧的虚拟dom
     let currentDom = oldVdom.dom
     parentDOM.removeChild(currentDom)
     if (oldVdom.classInstance && oldVdom.classInstance.componentWillUnmount) {
       oldVdom.classInstance.componentWillUnmount()
     }
     return null
-  } else if (oldVdom === null && newVdom) {
+  } else if (!oldVdom && newVdom) { // 新建dom节点
     let newDom = createDOM(newVdom)
     newVdom.dom = newDom
     parentDOM.appendChild(newDom)
