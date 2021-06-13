@@ -12,6 +12,7 @@ import Component from './component'
  * @returns {{type, props}}
  */
 function createElement(type, config, children) {
+  console.log(1)
   let ref
   if (config) {
     delete config._owner

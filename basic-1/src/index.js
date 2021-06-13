@@ -12,7 +12,6 @@ console.log(JSON.stringify(React.createElement('h1', {
 */
 
 
-
 class Count extends React.Component {
   constructor(props) {
     console.log('set up props and state')
@@ -25,26 +24,31 @@ class Count extends React.Component {
   componentWillMount() {
     console.log('componentWillMount')
   }
+
   componentDidMount() {
     console.log('componentDidMount')
   }
+
   handleClick = () => {
     // this.setState({
     //   number: this.state.number + 1
     // })
     // console.log(this.state.number)
     this.setState(prev => {
-      return {number: prev.number + 1 }
+      return { number: prev.number + 1 }
     })
   }
+
   shouldComponentUpdate(newProps, newStart) {
-    console.log('shouldComponentUpdate',newProps,newStart)
+    console.log('shouldComponentUpdate', newProps, newStart)
     return newStart.number % 2 === 0
   }
+
   componentWillUpdate() {
     console.log('componentWillUpdate')
 
   }
+
   componentDidUpdate() {
     console.log('componentDidUpdate')
   }
@@ -60,10 +64,10 @@ class Count extends React.Component {
   }
 }
 
-const element = React.createElement('h1', {
-  className: 'title',
-  style: { color: 'red' }
-}, React.createElement('span', null, 'hello'), 'world')
+// const element = React.createElement('h1', {
+//   className: 'title',
+//   style: { color: 'red' }
+// }, React.createElement('span', null, 'hello'), 'world')
 // console.log(JSON.stringify(element, null, 2))
 
 //
@@ -108,12 +112,31 @@ class Welcome extends React.Component {
   }
 }*/
 
+class demo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      number: 1
+    }
+  }
+
+  render() {
+    let element
+    let state = this.state.number
+    if (state > 0) {
+      element = null
+    } else {
+      element = this.state.number
+    }
+    return element
+  }
+}
 
 ReactDOM.render(
     // element,
     // <CountAdd/>,
     // <Welcome name='hcc' />,
-    <Count />,
+    <Count/>,
     document.getElementById('root')
 )
 

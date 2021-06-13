@@ -13,23 +13,23 @@ function render(vdom, root) {
 /**
  * 更新真实dom的属性
  * @param dom
- * @param props
+ * @param newProps
  */
-function updateProps(dom, props) {
-  for (const key in props) {
+function updateProps(dom, oldProps, newProps) {
+  for (const key in newProps) {
     if (key === 'children') continue
     if (key === 'style') {
-      let styleObj = props[key]
+      let styleObj = newProps[key]
       for (const styleObjKey in styleObj) {
         // dom.setAttribute('style', styleObj[styleObjKey])
         console.log(styleObj)
         dom.style[styleObjKey] = styleObj[styleObjKey]  // dom.style.color = 'red'
       }
     } else if (key.startsWith('on')) {
-      addEvent(dom, key.toLocaleLowerCase(), props[key])
-      // dom[key.toLocaleLowerCase()] = props[key]
+      addEvent(dom, key.toLocaleLowerCase(), newProps[key])
+      // dom[key.toLocaleLowerCase()] = newProps[key]
     } else {
-      dom[key] = props[key] // dom.className = 'title'
+      dom[key] = newProps[key] // dom.className = 'title'
     }
   }
 }
@@ -64,11 +64,15 @@ function updateFunctionComponent(vdom) {
 function updateClassComponent(vdom) {
   let { type, props } = vdom
   let classInstance = new type(props) // new Welcome({name:'hcc'}) // 1. 执行了组件的constructor
+  console.log(1)
+  vdom.classInstance = classInstance // 让虚拟dom的classInstance = 类组件实例 todo:
   if (classInstance.componentWillMount) {
     classInstance.componentWillMount()  // 2. 执行组件componentWillMount
   }
   let renderVdom = classInstance.render() // 3. 执行组件的render
   let dom = createDOM(renderVdom)
+  vdom.dom = renderVdom.dom = dom // 让这个类的虚拟dom的dom属性和render返回的虚拟dom绑定
+  classInstance.oldVdom = renderVdom // 让组件实例的oldVdom属性指向本次render出来的实例
   classInstance.dom = dom // 让类组件的实例上挂一个真实的dom
   // 简单处理componentWillMount
   if (classInstance.componentDidMount()) {
@@ -102,7 +106,7 @@ export function createDOM(vdom) {
   }
 
 
-  updateProps(dom, props) // 更新属性，把虚拟dom上的属性设置到真实DOM上
+  updateProps(dom, {}, props) // 更新属性，把虚拟dom上的属性设置到真实DOM上
 
 
   // 处理子节点 (如果子节点就是一个单节点，并且是字符串或者数字的话）
@@ -120,6 +124,64 @@ export function createDOM(vdom) {
     ref.current = dom
   }
   return dom
+}
+
+function updateClassInstance(oldVdom, newVdom) {
+
+}
+
+function updateprops(currentDom, props, props2) {
+
+}
+
+function updateChild(currentDom, children, children2) {
+
+}
+
+/**
+ * DOM-DIFF的时候，react为了提高性能有一些条件
+ * 1. 不考虑跨层级移动的情况
+ *
+ * 进入深度比较
+ * @param oldVdom
+ * @param newVdom
+ */
+function updateElement(oldVdom, newVdom) {
+  let currentDom = newVdom.dom = oldVdom.dom
+  newVdom.classInstance = oldVdom.classInstance
+  if (typeof oldVdom.type === 'string') { // 原生的dom类型
+    updateprops(currentDom, oldVdom.props, newVdom.props)
+    updateChild(currentDom, oldVdom.props.children, newVdom.props.children)
+  } else if (typeof oldVdom.type === 'function') {
+    updateClassInstance(oldVdom, newVdom)
+  }
+}
+
+/**
+ * 比较新旧2个虚拟dom树， 寻找差异， 把相应的差异更新到真实dom上
+ * @param parentDOM  父的dom节点
+ * @param oldVdom
+ * @param newVdom
+ */
+export function compareTwoVdom(parentDOM, oldVdom, newVdom) {
+  if (oldVdom === null && newVdom === null) {
+    return null
+  } else if (oldVdom && newVdom === null) { // 如果旧的虚拟dom有，新的没有，就需要删除旧的虚拟dom
+    let currentDom = oldVdom.dom
+    parentDOM.removeChild(currentDom)
+    if (oldVdom.classInstance && oldVdom.classInstance.componentWillUnmount) {
+      oldVdom.classInstance.componentWillUnmount()
+    }
+    return null
+  } else if (oldVdom === null && newVdom) {
+    let newDom = createDOM(newVdom)
+    newVdom.dom = newDom
+    parentDOM.appendChild(newDom)
+    return newVdom
+  } else {
+    // 新旧节点都有值
+    updateElement(oldVdom, newVdom)
+  }
 }
 
 export default {

@@ -1,4 +1,4 @@
-import { createDOM } from './react-dom'
+import { compareTwoVdom, createDOM } from './react-dom'
 import { isFunction } from './utils'
 
 
@@ -28,6 +28,10 @@ class Updater {
   addState(partialState) {
     this.pendingStates.push(partialState)
     // 如果是批量更新（异步更新) 就放入更新队列中，如果是同步更新，就直接调用updateComponent进行更新
+    this.emitUpdate()
+  }
+
+  emitUpdate() {
     updateQueue.isBatchingUpdate ? updateQueue.add(this) : this.updateComponent()
   }
 
@@ -61,11 +65,11 @@ function shouldComponent(classInstance, newState) {
   // 就算没有更新，也需要更新state
   classInstance.state = newState
   //todo: props暂时没有处理
-  if(classInstance.shouldComponentUpdate
-      && !classInstance.shouldComponentUpdate(classInstance.props,newState)) {
+  if (classInstance.shouldComponentUpdate
+      && !classInstance.shouldComponentUpdate(classInstance.props, newState)) {
     return
   }
-  if(classInstance.componentWillMount) {
+  if (classInstance.componentWillMount) {
     classInstance.componentWillMount()
   }
   classInstance.forceUpdate()
@@ -94,8 +98,17 @@ class Component {
   }
 
   forceUpdate() {
+    if (this.componentWillUpdate) {
+      this.componentWillUpdate()
+    }
     let newVdom = this.render()
-    updateClassInstance(this, newVdom)
+    let currentVdom = compareTwoVdom(this.oldVdom.dom.parentNode, this.oldVdom, newVdom)
+    // 每次更新后，最新的vdom会成为最新的上一次的vdom,等待下一次比较
+    this.oldVdom = currentVdom
+
+    if (this.componentDidUpdate) {
+      this.componentDidUpdate()
+    }
   }
 }
 
@@ -103,7 +116,7 @@ function updateClassInstance(classInstance, newVdom) {
   let newDom = createDOM(newVdom) //得到真实dom
   let oldDom = classInstance.dom
   oldDom.parentNode.replaceChild(newDom, oldDom)
-  if(classInstance.componentDidUpdate) {
+  if (classInstance.componentDidUpdate) {
     classInstance.componentDidUpdate()
   }
   classInstance.dom = newDom
