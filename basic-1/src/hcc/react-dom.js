@@ -4,9 +4,9 @@
  * @param root  容器
  */
 import { addEvent } from './event'
+import React from './react'
 
 function render(vdom, root) {
-  console.log(vdom)
   const dom = createDOM(vdom)
   root.appendChild(dom)
 }
@@ -64,7 +64,7 @@ function updateFunctionComponent(vdom) {
 function updateClassComponent(vdom) {
   let { type, props } = vdom
   let classInstance = new type(props) // new Welcome({name:'hcc'}) // 1. 执行了组件的constructor
-  console.log(1)
+  console.log(vdom)
   vdom.classInstance = classInstance // 让虚拟dom的classInstance = 类组件实例
   if (classInstance.componentWillMount) {
     classInstance.componentWillMount()  // 2. 执行组件componentWillMount

@@ -1,5 +1,5 @@
-import React from './hcc/react'
-import ReactDOM from './hcc/react-dom'
+import React from './hcc/react.js'
+import ReactDOM from './hcc/react-dom.js'
 // import React from 'react'
 // import ReactDOM from 'react-dom'
 import './index.css'
@@ -10,6 +10,7 @@ console.log(JSON.stringify(React.createElement('h1', {
   style: { color: 'red' },
 }, 'hello', 'weod'), null, 1))
 */
+
 
 
 class Counter extends React.Component {
@@ -105,53 +106,8 @@ class ChildCounter extends React.Component {
   }
 }
 
-// const element = React.createElement('h1', {
-//   className: 'title',
-//   style: { color: 'red' }
-// }, React.createElement('span', null, 'hello'), 'world')
-// console.log(JSON.stringify(element, null, 2))
-
-//
-// function Welcome(props) {
-//   // return React.createElement("h1", {
-//   //   className: props.className,
-//   //   style: {
-//   //     color: 'red'
-//   //   }
-//   // }, React.createElement('span', null, 'hello'), 'world')
-//   return <h1>hello {props.name}</h1>
-// }
-
-
-/*class CountAdd extends React.Component {
-  constructor(props) {
-    super(props);
-    this.a = React.createRef()
-    this.b = React.createRef()
-    this.c = React.createRef()
-  }
-  add = () => {
-    let aValue = this.a.current.value
-    let bValue = this.b.current.value
-    this.c.current.value = parseFloat(aValue) + parseFloat(bValue)
-  }
-  render() {
-    return (
-        <div>
-          <input ref={this.a} type="text"/> <br/>
-          <input ref={this.b} type="text"/>
-          <button onClick={this.add}>=</button><br/>
-          <input type="text" ref={this.c}/>
-        </div>
-    )
-  }
-}*/
-
 
 const element = <Counter />
-const a = <div>ddd</div>
-console.log(a)
-console.log(element)
 // console.log(element)
 ReactDOM.render(
     // element,
