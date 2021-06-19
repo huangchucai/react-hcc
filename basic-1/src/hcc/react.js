@@ -30,6 +30,7 @@ function createElement(type, config, children) {
     props
   }
 }
+
 /*
   'type': 'h1',
   'ref: null,
@@ -44,6 +45,26 @@ function createElement(type, config, children) {
     ]
   }
 */
+
+
+function createContext() {
+  let currentValue
+
+  function Provider({ value, children }) {
+    currentValue = value
+    return children
+  }
+
+  function Consumer({ children }) {
+    return children(currentValue)
+
+  }
+
+  return {
+    Provider,
+    Consumer
+  }
+}
 
 function createRef() {
   return {

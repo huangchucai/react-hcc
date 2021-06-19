@@ -1,11 +1,11 @@
+
+import { addEvent } from './event'
+
 /**
  * 虚拟dom转换成真实dom, 并插入到容器中
  * @param vdom 虚拟dom
  * @param root  容器
- */
-import { addEvent } from './event'
-import React from './react'
-
+ **/
 function render(vdom, root) {
   const dom = createDOM(vdom)
   root.appendChild(dom)
