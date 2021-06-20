@@ -100,6 +100,7 @@ function useEffect(callback, deps) {
     if (same) {
       hookIndex++
     } else {
+      console.log('1')
       destroy && destroy()
       let state = { lastDeps: deps }
       hooksState[hookIndex++] = state
@@ -118,7 +119,12 @@ function useEffect(callback, deps) {
   }
 }
 
-function App() {
+function useRef(current) {
+  hooksState[hookIndex] = hooksState[hookIndex] || { current }
+  return hooksState[hookIndex++]
+}
+
+/*function App() {
   const [count, setCount] = useState(0)
   console.log('render')
   useEffect(() => {
@@ -143,12 +149,136 @@ function App() {
         <button onClick={() => {
           dispatch('ADD')
         }}>+1</button>
-        {/*<input type="text" value={name} onChange={(e) => {*/}
-        {/*  setName(e.target.value)*/}
-        {/*}}/>*/}
+        {/!*<input type="text" value={name} onChange={(e) => {*!/}
+        {/!*  setName(e.target.value)*!/}
+        {/!*}}/>*!/}
 
-        {/*<Child data={data} handle={handle}/>*/}
+        {/!*<Child data={data} handle={handle}/>*!/}
       </div>
+  )
+}*/
+
+function getArticle(id) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        title: `这是第${id}篇文章`,
+        id
+      })
+    }, 1000 * (5 - id))
+  })
+}
+
+function Article(props) {
+  const [articleData, setArticleData] = useState({})
+  const { id } = props
+  console.log(id)
+  useEffect(() => {
+    let cancel = false
+
+    async function getData() {
+      let res = await getArticle(id)
+      if (!cancel) {
+        setArticleData(res)
+      }
+    }
+
+    getData()
+    return () => {
+      cancel = true
+    }
+  }, [id])
+  return (
+      <div>
+        <h6>{articleData.id}</h6>
+        <h6>{articleData.title}</h6>
+      </div>
+  )
+}
+
+/*function App() {
+  const [id, setId] = useState(0)
+  return (
+      <div>
+        <h4>获取文章{id}</h4>
+        <button onClick={() => {
+          setId(id + 1)
+        }}>+id</button>
+        <Article id={id}/>
+      </div>
+  )
+}*/
+
+/*function FunctionChild(props) {
+  const { dom } = props
+  return (
+      <input ref={dom}/>
+  )
+}*/
+
+function forwardRef(FunctionChild) {
+  return class extends React.Component {
+    constructor(props) {
+      super(props);
+    }
+    render() {
+      console.log(this)
+      return FunctionChild(this.props, this.props.ref2)
+    }
+  }
+
+}
+
+const FunctionChild = forwardRef((props, ref) => {
+  return (
+      <input ref={ref}/>
+  )
+})
+
+class ClassChild extends React.Component {
+  constructor(props) {
+    super(props)
+    this.dom = props.dom
+    this.ref = React.createRef()
+  }
+
+  focus() {
+    this.ref.current.focus()
+  }
+
+  render() {
+    return (
+        <input ref={this.dom}/>
+    )
+  }
+}
+
+function App() {
+  const [number, setNumber] = useState(0)
+  const classRef = useRef(null)
+  const funcRef = useRef(null)
+  const refNumber = useRef(number)
+
+  React.useEffect(() => {
+    // console.log(classRef.current.focus())
+    console.log(refNumber,number)
+    refNumber.current = number
+    console.log(funcRef.current.focus())
+  })
+  return (
+      <>
+        <p>{number}</p>
+        <button onClick={() => {
+          setNumber(number + 1)
+        }}> +1</button>
+        <button onClick={() => {
+          setTimeout(() => {
+            alert(refNumber.current)
+          }, 2000)
+        }}>输出</button>
+        <ClassChild dom={classRef}/>
+        <FunctionChild ref2={funcRef}/>
+      </>
   )
 }
 
