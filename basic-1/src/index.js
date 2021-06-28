@@ -1,6 +1,6 @@
 // import React from './hcc/react.js'
 // import ReactDOM from './hcc/react-dom.js'
-import React, { memo } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 let hooksState = []
@@ -66,6 +66,7 @@ const Child = memo(function Child(props) {
 // const useReducer = function() {
 //
 // }
+/*
 
 function useReducer(reducer, initValue, init) {
   hooksState[hookIndex] = hooksState[hookIndex] || (init ? init(initValue) : initValue)
@@ -123,6 +124,7 @@ function useRef(current) {
   hooksState[hookIndex] = hooksState[hookIndex] || { current }
   return hooksState[hookIndex++]
 }
+*/
 
 /*function App() {
   const [count, setCount] = useState(0)
@@ -219,8 +221,9 @@ function Article(props) {
 function forwardRef(FunctionChild) {
   return class extends React.Component {
     constructor(props) {
-      super(props);
+      super(props)
     }
+
     render() {
       console.log(this)
       return FunctionChild(this.props, this.props.ref2)
@@ -253,7 +256,7 @@ class ClassChild extends React.Component {
   }
 }
 
-function App() {
+/*function App() {
   const [number, setNumber] = useState(0)
   const classRef = useRef(null)
   const funcRef = useRef(null)
@@ -280,7 +283,42 @@ function App() {
         <FunctionChild ref2={funcRef}/>
       </>
   )
+}*/
+
+function useRequest() {
+  console.log('useRequest')
+  const [users, setUsers] = useState([])
+
+  let loadMore = function() {
+    setUsers(null)
+    loadMore = 111
+    setTimeout(() => {
+      setUsers([...users, ...[1, 2, 3]])
+    }, 3000)
+  }
+
+  // useEffect(loadMore, [])
+  return [users, loadMore]
 }
+
+function App() {
+  let [users, loadMore] = useRequest()
+  console.log(users, loadMore)
+  if (!users) return (
+      <div>... 加载中</div>
+  )
+  return (
+      <>
+        <div>有</div>
+        <ul>
+          {users.map((item,index) => (<li key={index}>{item}</li>))}
+        </ul>
+        <button onClick={loadMore}>加载中</button>
+      </>
+
+  )
+}
+
 
 function render() {
   hookIndex = 0
