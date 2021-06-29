@@ -10,12 +10,12 @@ import Profile from './components/Profile'
 
 
 ReactDOM.render(
-    <BrowserRouter>
+    <HashRouter>
       <>
         <Route path="/" component={Home} exact/>
         <Route path="/user" component={User}/>
         <Route path="/profile" component={Profile}/>
       </>
-    </BrowserRouter>,
+    </HashRouter>,
     document.getElementById('root')
 )
