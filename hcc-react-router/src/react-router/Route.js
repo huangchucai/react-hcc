@@ -1,27 +1,24 @@
 import React, { Component } from 'react'
 import RouterContext from './RouterContext'
+import matchPath from './matchPath'
 
 class Route extends Component {
+  static contextType = RouterContext
+
   render() {
-    return (
-        <RouterContext.Consumer>
-          {
-            (context) => {
-              const { history, location } = context
-              const { component, path } = this.props
-              const match = location.pathname === path // 如果匹配
-              const RouteProps = {
-                history,
-                match,
-                location
-              }
-              if (match) {
-                return React.createElement(component, RouteProps)
-              }
-            }
-          }
-        </RouterContext.Consumer>
-    )
+    const { history, location } = this.context
+    const { component } = this.props
+    const match = matchPath(location.pathname, this.props) // 如果匹配
+    const RouteProps = {
+      history,
+      match,
+      location
+    }
+    if (match) {
+      return React.createElement(component, RouteProps)
+    } else {
+      return null
+    }
   }
 }
 

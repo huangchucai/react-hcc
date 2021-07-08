@@ -41,13 +41,19 @@ function createHashHistory() {
 
   /**
    *
-   * @param pathname 跳转到那个路径
+   * @param location 跳转到那个路径 可能是一个对象或者路径字符串
    * @param state  这个路径的状态对象
    */
-  function push(pathname, newState) {
+  function push(location, newState) {
     action = 'PUSH'
-    state = newState
-    window.location.hash = pathname
+    if (typeof location === 'object') {
+      state=location.state
+      window.location.hash = location.pathname
+
+    } else {
+      state = newState
+      window.location.hash = location
+    }
   }
 
   const history = {

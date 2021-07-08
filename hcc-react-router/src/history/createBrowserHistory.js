@@ -29,11 +29,15 @@ function createBrowserHistory() {
 
   /**
    *
-   * @param pathname 跳转到那个路径
+   * @param pathname 跳转到那个路径或者是一个对象{pathname: '', state: ''}
    * @param state  这个路径的状态对象
    */
   function push(pathname, state) {
     const action = 'PUSH'
+    if (typeof pathname === 'object') {
+      state = pathname.state
+      pathname = pathname.pathname
+    }
     globalHistory.pushState(state, null, pathname)
     let location = {
       pathname,
